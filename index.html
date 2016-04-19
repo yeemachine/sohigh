@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/highcharts-more.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.3.5/tabletop.min.js"></script>
+    <script>
+    var answer=prompt("Who do you want to look up?");
+     $.getJSON('http://cooper-union-instagram-proxy.herokuapp.com/search/user/'+ answer  , function(name){
+
+       var userid=name[0].id
+
+       $.getJSON("http://cooper-union-instagram-proxy.herokuapp.com/user/"+userid+ "/recent?count=33", function(response){
+
+        var howMany = 0;
+        var positionsOfPhotos = [];
+        var position = {
+          likes:[],
+          title:[]
+        };
+        for(var i=0; i<response.length; i++) {
+
+            if((response[i].caption) && (response[i].caption.text !== null)) {
+              position.title[i] = response[i].caption.text;
+              position.likes[i] = response[i].likes.count;
+
+            }
+          else{
+            position.title[i] = " ";
+          }
+        }
+
+        console.log(position.title);
+        console.log(position.likes);
+
+        $(function () {
+            var data = [{
+                name: "",
+                data: position.likes
+
+            }];
+            $('#container').highcharts({
+                chart: {
+                    type: 'bar'
+                },
+                title: {
+                    text: 'Instagram Caption Likes'
+                },
+                xAxis: {
+                    categories: position.title
+                },
+                yAxis: {
+                    title: {
+                        text: 'Likes'
+                    }
+                },
+                series: data
+            });
+        });
+      });
+    });
+    </script>
+  </head>
+  <body>
+    <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+  </body>
+</html>
